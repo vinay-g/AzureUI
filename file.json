@@ -1,8 +1,9 @@
 {
   "handler": "Microsoft.Compute.SingleVm",
   "version": "0.0.1-preview",
-  "parameters": 
-    "basics": [{
+  "parameters": {
+    "basics": [
+      {
         "name": "adminUsername",
         "type": "Microsoft.Compute.UserNameTextBox",
         "label": "Username",
@@ -28,7 +29,7 @@
         "osPlatform": "Linux"
       }
     ],
-     "networkSecurityGroupRules": [
+    "networkSecurityGroupRules": [
       {
         "name": "SSH",
         "protocol": "TCP",
