@@ -1,9 +1,8 @@
 {
   "handler": "Microsoft.Compute.SingleVm",
   "version": "0.0.1-preview",
-  "parameters": {
-    "basics": [
-      {
+  "parameters": 
+    "basics": [{
         "name": "adminUsername",
         "type": "Microsoft.Compute.UserNameTextBox",
         "label": "Username",
@@ -27,6 +26,32 @@
           "hideConfirmation": false
         },
         "osPlatform": "Linux"
+      }
+    ],
+     "networkSecurityGroupRules": [
+      {
+        "name": "SSH",
+        "protocol": "TCP",
+        "destinationPortRange": "22",
+        "access": "allow",
+        "priority": "1010",
+        "direction": "inbound"
+      },
+      {
+        "name": "SSL",
+        "protocol": "TCP",
+        "destinationPortRange": "443",
+        "access": "allow",
+        "priority": "1020",
+        "direction": "inbound"
+      },
+      {
+        "name": "HTTP",
+        "protocol": "TCP",
+        "destinationPortRange": "80",
+        "access": "allow",
+        "priority": "1030",
+        "direction": "inbound"
       }
     ],
     "steps": [
