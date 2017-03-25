@@ -2,63 +2,130 @@
   "handler": "Microsoft.Compute.SingleVm",
   "version": "0.0.1-preview",
   "parameters": {
-    "osPlatform": "Linux",
-    "recommendedSizes": [
-      "Standard_DS13"
-    ],
-    "imageReference": {
-      "publisher": "teradata",
-      "offer": "viewpoint-beta-preview",
-      "sku": "viewpoint-beta",
-      "version": "2.0.4"
-    },
-    "diskType": "Standard",
-    "dataDisks": [
+    "basics": [
       {
-        "lun": 0
+        "name": "adminUsername",
+        "type": "Microsoft.Compute.UserNameTextBox",
+        "label": "Username",
+        "toolTip": "Admin username for the virtual machine",
+        "osPlatform": "Linux"
+      },
+      {
+        "name": "adminPassword",
+        "type": "Microsoft.Compute.CredentialsCombo",
+        "label": {
+          "password": "Password",
+          "confirmPassword": "Confirm password"
+        },
+        "toolTip": {
+          "password": "Admin password for the virtual machine"
+        },
+         "constraints": {
+          "required": true
+        },
+        "options": {
+          "hideConfirmation": false
+        },
+        "osPlatform": "Linux"
       }
     ],
-    "networkSecurityGroupRules": [
+    "steps": [
       {
-        "name": "SSH",
-        "protocol": "TCP",
-        "destinationPortRange": "22",
-        "access": "allow",
-        "priority": "1010",
-        "direction": "inbound"
-      },
-      {
-        "name": "AMQ",
-        "protocol": "TCP",
-        "destinationPortRange": "61616",
-        "access": "allow",
-        "priority": "1020",
-        "direction": "inbound"
-      },
-      {
-        "name": "SSL",
-        "protocol": "TCP",
-        "destinationPortRange": "443",
-        "access": "allow",
-        "priority": "1030",
-        "direction": "inbound"
-      },
-      {
-        "name": "CAM",
-        "protocol": "TCP",
-        "destinationPortRange": "5432",
-        "access": "allow",
-        "priority": "1040",
-        "direction": "inbound"
-      },
-      {
-        "name": "HTTP",
-        "protocol": "TCP",
-        "destinationPortRange": "80",
-        "access": "allow",
-        "priority": "1050",
-        "direction": "inbound"
+        "name": "infrastructureConfig",
+        "label": "Infrastructure settings",
+        "subLabel": {
+          "preValidation": "Configure the infrastructure settings",
+          "postValidation": "Done"
+        },
+        "bladeTitle": "Infrastructure settings",
+        "elements": [{
+            "name": "virtualNetworkConfiguration",
+            "type": "Microsoft.Common.Section",
+            "label": "Virtual Network Configuration",
+            "elements": [
+              {
+                "name": "virtualNetwork",
+                "type": "Microsoft.Network.VirtualNetworkCombo",
+                "label": {
+                  "virtualNetwork": "Virtual network",
+                  "subnets": "Subnet"
+                },
+                "toolTip": {
+                  "virtualNetwork": "Create a new Virtual Network or use an existing one",
+                  "subnets": "Choose the Subnet for the Virtual Network for AppCenter machine. If choosing an existing Virtual Network, the Subnet to use will need to exist beforehand; Creating a new subnet in an existing Virtual Network is not supported"
+                },
+                "defaultValue": {
+                  "name": "es-net",
+                  "addressPrefixSize": "/16"
+                },
+                "constraints": {
+                  "minAddressPrefixSize": "/16"
+                },
+                "options": {
+                  "hideExisting": false
+                },
+                "subnets": {
+                  "subnet1": {
+                    "label": "subnet",
+                    "defaultValue": {
+                      "name": "es-subnet",
+                      "addressPrefixSize": "/24"
+                    },
+                    "constraints": {
+                      "minAddressPrefixSize": "/24",
+                      "minAddressCount": 12,
+                      "requireContiguousAddresses": true
+                    }
+                  }
+                }
+              }
+            ]
+          },
+          {
+            "name": "vmSize",
+            "type": "Microsoft.Compute.SizeSelector",
+            "label": "Virtual machine size",
+            "toolTip": "The size of the virtual machine for the domain controller.",
+            "recommendedSizes": [
+              "Standard_D3_v2",
+              "Standard_D13_v2"
+            ],
+            "constraints": {
+              "allowedSizes": [
+                "Standard_D3_v2",
+                "Standard_D13_v2"
+              ]
+            },
+            "osPlatform": "Linux",
+            "imageReference": {
+              "publisher": "Teradata",
+              "offer": "AppCenter",
+              "sku": "6.01.02"
+            }
+          },
+          {
+            "name": "dnsAndPublicIP",
+            "type": "Microsoft.Network.PublicIpAddressCombo",
+            "label": {
+              "publicIpAddress": "Public IP address",
+              "domainNameLabel": "DNS Prefix"
+            },
+            "toolTip": {
+              "domainNameLabel": "DNS Prefix for the VM public IP addresses."
+            },
+            "defaultValue": {
+              "publicIpAddressName": "publicIP"
+            },
+            "options": {
+              "hideNone": true
+            }
+          }
+        ]
       }
-    ]
+    ],
+    "outputs": {
+      "adminUsername": "[basics('adminUsername')]",
+      "adminPassword": "[basics('adminPassword')]"
+    }
   }
 }
