@@ -2,74 +2,63 @@
   "handler": "Microsoft.Compute.SingleVm",
   "version": "0.0.1-preview",
   "parameters": {
-    "basics": [{
-      "name": "adminUsername",
-      "type": "Microsoft.Compute.UserNameTextBox",
-      "label": "Username",
-      "toolTip": "Admin username for the virtual machine",
-      "osPlatform": "Linux"
-    }, {
-      "name": "adminPassword",
-      "type": "Microsoft.Compute.CredentialsCombo",
-      "label": {
-        "password": "Password",
-        "confirmPassword": "Confirm password"
+    "osPlatform": "Linux",
+    "recommendedSizes": [
+      "Standard_DS13"
+    ],
+    "imageReference": {
+      "publisher": "teradata",
+      "offer": "viewpoint-beta-preview",
+      "sku": "viewpoint-beta",
+      "version": "2.0.4"
+    },
+    "diskType": "Standard",
+    "dataDisks": [
+      {
+        "lun": 0
+      }
+    ],
+    "networkSecurityGroupRules": [
+      {
+        "name": "SSH",
+        "protocol": "TCP",
+        "destinationPortRange": "22",
+        "access": "allow",
+        "priority": "1010",
+        "direction": "inbound"
       },
-      "toolTip": {
-        "password": "Admin password for the virtual machine"
+      {
+        "name": "AMQ",
+        "protocol": "TCP",
+        "destinationPortRange": "61616",
+        "access": "allow",
+        "priority": "1020",
+        "direction": "inbound"
       },
-      "osPlatform": "Linux"
-    }],
-    "steps": [{
-      "name": "infrastructureConfig",
-      "label": "Infrastructure settings",
-      "subLabel": {
-        "preValidation": "Configure the infrastructure settings",
-        "postValidation": "Done"
+      {
+        "name": "SSL",
+        "protocol": "TCP",
+        "destinationPortRange": "443",
+        "access": "allow",
+        "priority": "1030",
+        "direction": "inbound"
       },
-      "bladeTitle": "Infrastructure settings",
-      "elements": [{
-        "name": "vmSize",
-        "type": "Microsoft.Compute.SizeSelector",
-        "label": "Virtual machine size",
-        "toolTip": "The size of the virtual machine for the domain controller.",
-        "recommendedSizes": [
-          "Standard_D3_v2",
-          "Standard_D13_v2"
-        ],
-        "constraints": {
-          "allowedSizes": [
-            "Standard_D3_v2",
-            "Standard_D13_v2"
-          ]
-        },
-        "osPlatform": "Linux",
-        "imageReference": {
-          "publisher": "Teradata",
-          "offer": "AppCenter",
-          "sku": "6.01.02"
-        }
-      }, {
-        "name": "dnsAndPublicIP",
-        "type": "Microsoft.Network.PublicIpAddressCombo",
-        "label": {
-          "publicIpAddress": "Public IP address",
-          "domainNameLabel": "DNS Prefix"
-        },
-        "toolTip": {
-          "domainNameLabel": "DNS Prefix for the VM public IP addresses."
-        },
-        "defaultValue": {
-          "publicIpAddressName": "publicIP"
-        },
-        "options": {
-          "hideNone": true
-        }
-      }]
-    }],
-    "outputs": {
-      "adminUsername": "[basics('adminUsername')]",
-      "adminPassword": "[basics('adminPassword')]"
-    }
+      {
+        "name": "CAM",
+        "protocol": "TCP",
+        "destinationPortRange": "5432",
+        "access": "allow",
+        "priority": "1040",
+        "direction": "inbound"
+      },
+      {
+        "name": "HTTP",
+        "protocol": "TCP",
+        "destinationPortRange": "80",
+        "access": "allow",
+        "priority": "1050",
+        "direction": "inbound"
+      }
+    ]
   }
 }
