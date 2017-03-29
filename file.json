@@ -146,7 +146,7 @@
       "authenticationType": "[basics('adminPassword').authenticationType]",
       "adminPassword": "[basics('adminPassword').password]",
       "sshPublicKey": "[basics('adminPassword').sshPublicKey]",
-      "vmSize": "[steps('appcenterConfig').vmSize]",
+      "vmSize": "[steps('settingsStep').vmSize]",
       "vNetNewOrExisting": "[steps('settingsStep').virtualNetworkConfiguration.virtualNetwork.newOrExisting]",
       "newOrExistingSubnetName": "[steps('settingsStep').virtualNetworkConfiguration.virtualNetwork.subnets.subnet1.name]",
       "existingVnetResourceGroupName": "[steps('clusterSettingsStep').virtualNetworkConfiguration.virtualNetwork.resourceGroup]"
