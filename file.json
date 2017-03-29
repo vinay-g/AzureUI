@@ -149,7 +149,7 @@
       "vmSize": "[steps('appcenterConfig').vmSize]",
       "vNetNewOrExisting": "[steps('settingsStep').virtualNetworkConfiguration.virtualNetwork.newOrExisting]",
       "newOrExistingSubnetName": "[steps('settingsStep').virtualNetworkConfiguration.virtualNetwork.subnets.subnet1.name]",
-      "existingVnetResourceGroupName": "[steps('clusterSettingsStep').virtualNetworkConfiguration.virtualNetwork.resourceGroup]",
+      "existingVnetResourceGroupName": "[steps('clusterSettingsStep').virtualNetworkConfiguration.virtualNetwork.resourceGroup]"
       
     }
   }
