@@ -1,26 +1,36 @@
 {
-  "handler": "Microsoft.Compute.SingleVm",
-  "version": "0.0.1-preview",
+  "handler": "Microsoft.Compute.MultiVm",
+  "version": "0.1.2-preview",
   "parameters": {
     "basics": [
       {
         "name": "adminUsername",
         "type": "Microsoft.Compute.UserNameTextBox",
-        "label": "Username",
-        "toolTip": "Admin username for the virtual machine",
+        "label": "User name",
+        "defaultValue": "",
+        "toolTip": "Specify a user for accessing the virtual machines within your cluster. Must be a valid Linux username",
+        "constraints": {
+          "required": true,
+          "regex": "^(?!(?:adm|admin|audio|backup|bin|cdrom|crontab|daemon|dialout|dip|disk|fax|floppy|fuse|games|gnats|irc|kmem|landscape|libuuid|list|lp|mail|man|messagebus|mlocate|netdev|news|nobody|nogroup|operator|plugdev|proxy|root|sasl|shadow|src|ssh|sshd|staff|sudo|sync|sys|syslog|tape|tty|users|utmp|uucp|video|voice|whoopsie|www\\-data)$)\\w+$",
+          "validationMessage": "Username must not be a reserved Linux username"
+        },
         "osPlatform": "Linux"
       },
       {
-        "name": "adminPassword",
+        "name": "password",
         "type": "Microsoft.Compute.CredentialsCombo",
         "label": {
+          "authenticationType": "Authentication type",
           "password": "Password",
-          "confirmPassword": "Confirm password"
+          "confirmPassword": "Confirm password",
+          "sshPublicKey": "SSH public key"
         },
         "toolTip": {
-          "password": "Admin password for the virtual machine"
+          "authenticationType": "Choose Authentication type Password or PublicKey(SSH).",
+          "password": "Enter the password for the specified user name.",
+          "sshPublicKey": "Copy Public key into field."
         },
-         "constraints": {
+        "constraints": {
           "required": true
         },
         "options": {
@@ -29,42 +39,50 @@
         "osPlatform": "Linux"
       }
     ],
-    "networkSecurityGroupRules": [
-      {
-        "name": "SSH",
-        "protocol": "TCP",
-        "destinationPortRange": "22",
-        "access": "allow",
-        "priority": "1010",
-        "direction": "inbound"
-      },
-      {
-        "name": "SSL",
-        "protocol": "TCP",
-        "destinationPortRange": "443",
-        "access": "allow",
-        "priority": "1020",
-        "direction": "inbound"
-      },
-      {
-        "name": "HTTP",
-        "protocol": "TCP",
-        "destinationPortRange": "80",
-        "access": "allow",
-        "priority": "1030",
-        "direction": "inbound"
-      }
-    ],
     "steps": [
       {
-        "name": "infrastructureConfig",
-        "label": "Infrastructure settings",
+        "name": "settingsStep",
+        "label": "AppCenter Settings",
         "subLabel": {
-          "preValidation": "Configure the infrastructure settings",
+          "preValidation": "Required",
           "postValidation": "Done"
         },
-        "bladeTitle": "Infrastructure settings",
-        "elements": [{
+        "bladeTitle": "AppCenter Settings",
+        "elements": [
+          {
+            "name": "customVmName",
+            "type": "Microsoft.Common.TextBox",
+            "label": "AppCenter system name",
+            "defaultValue": "appcenter",
+            "toolTip": "Name to be used for AppCenter node",
+            "constraints": {
+              "required": true,
+              "regex": "^[a-z][a-z0-9]{2,10}$",
+              "validationMessage": "System name must be between 3 and 10 characters long, can contain only numbers and lowercase letters, and must start with a letter."
+            }
+          },
+          {
+            "name": "vmSize",
+            "type": "Microsoft.Compute.SizeSelector",
+            "label": "VM size",
+            "toolTip": "Size of the virtual machine to provision for AppCenter",
+            "recommendedSizes": [
+              "Standard_DS13_v2"
+            ],
+            "constraints": {
+              "allowedSizes": [
+                "Standard_DS13_v2"
+              ]
+            },
+            "osPlatform": "Linux",
+            "imageReference": {
+              "publisher": "teradata",
+              "offer": "teradata-appcenter",
+              "sku": "teradata-aster-appcenter-hourly"
+            },
+            "count": 1
+          },
+          {
             "name": "virtualNetworkConfiguration",
             "type": "Microsoft.Common.Section",
             "label": "Virtual Network Configuration",
@@ -74,33 +92,32 @@
                 "type": "Microsoft.Network.VirtualNetworkCombo",
                 "label": {
                   "virtualNetwork": "Virtual network",
-                  "subnets": "Subnet"
+                  "subnets": "Subnets"
                 },
                 "toolTip": {
                   "virtualNetwork": "Create a new Virtual Network or use an existing one",
-                  "subnets": "Choose the Subnet for the Virtual Network for AppCenter machine. If choosing an existing Virtual Network, the Subnet to use will need to exist beforehand; Creating a new subnet in an existing Virtual Network is not supported"
+                  "subnets": "Choose the Subnet for AppCenter nodes. If choosing an existing Virtual Network, the Subnets to use will need to exist beforehand; Creating a new subnet in an existing Virtual Network is not supported"
                 },
                 "defaultValue": {
-                  "name": "es-net",
-                  "addressPrefixSize": "/16"
+                  "name": "ap-net",
+                  "addressPrefixSize": "/24"
                 },
                 "constraints": {
-                  "minAddressPrefixSize": "/16"
+                  "minAddressPrefixSize": "/24"
                 },
                 "options": {
                   "hideExisting": false
                 },
                 "subnets": {
                   "subnet1": {
-                    "label": "subnet",
+                    "label": "AppCenter node subnet",
                     "defaultValue": {
-                      "name": "es-subnet",
-                      "addressPrefixSize": "/24"
+                      "name": "ap-subnet",
+                      "addressPrefixSize": "/25"
                     },
                     "constraints": {
-                      "minAddressPrefixSize": "/24",
-                      "minAddressCount": 12,
-                      "requireContiguousAddresses": true
+                      "minAddressPrefixSize": "/25",
+                      "minAddressCount": 1
                     }
                   }
                 }
@@ -108,50 +125,32 @@
             ]
           },
           {
-            "name": "vmSize",
-            "type": "Microsoft.Compute.SizeSelector",
-            "label": "Virtual machine size",
-            "toolTip": "The size of the virtual machine for the domain controller.",
-            "recommendedSizes": [
-              "Standard_D3_v2",
-              "Standard_D13_v2"
-            ],
+            "name": "dnsLabelPrefix",
+            "type": "Microsoft.Common.TextBox",
+            "label": "DNS Prefix",
+            "defaultValue": "appcenter",
+            "toolTip": "Specify a dns prefix for the AppCenter machine",
             "constraints": {
-              "allowedSizes": [
-                "Standard_D3_v2",
-                "Standard_D13_v2"
-              ]
+              "required": true,
+              "validationMessage": "DNS prefix is required."
             },
-            "osPlatform": "Linux",
-            "imageReference": {
-              "publisher": "Teradata",
-              "offer": "AppCenter",
-              "sku": "6.01.02"
-            }
-          },
-          {
-            "name": "dnsAndPublicIP",
-            "type": "Microsoft.Network.PublicIpAddressCombo",
-            "label": {
-              "publicIpAddress": "Public IP address",
-              "domainNameLabel": "DNS Prefix"
-            },
-            "toolTip": {
-              "domainNameLabel": "DNS Prefix for the VM public IP addresses."
-            },
-            "defaultValue": {
-              "publicIpAddressName": "publicIP"
-            },
-            "options": {
-              "hideNone": true
-            }
+            "osPlatform": "Linux"
           }
         ]
       }
     ],
     "outputs": {
-      "adminUsername": "[basics('adminUsername')]",
-      "adminPassword": "[basics('adminPassword')]"
+      "location": "[location()]",
+      "customVmName": "[basics('customVmName')]",
+      "adminUserName": "[basics('adminUsername')]",
+      "authenticationType": "[basics('SSHCredentials').authenticationType]",
+      "adminPassword": "[basics('SSHCredentials').password]",
+      "sshPublicKey": "[basics('SSHCredentials').sshPublicKey]",
+      "vmSize": "[steps('appcenterConfig').vmSize]",
+      "vNetNewOrExisting": "[steps('settingsStep').virtualNetworkConfiguration.virtualNetwork.newOrExisting]",
+      "newOrExistingSubnetName": "[steps('settingsStep').virtualNetworkConfiguration.virtualNetwork.subnets.subnet1.name]",
+      "existingVnetResourceGroupName": "[steps('clusterSettingsStep').virtualNetworkConfiguration.virtualNetwork.resourceGroup]",
+      
     }
   }
 }
