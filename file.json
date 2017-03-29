@@ -143,13 +143,14 @@
       "location": "[location()]",
       "customVmName": "[basics('customVmName')]",
       "adminUserName": "[basics('adminUsername')]",
-      "authenticationType": "[basics('SSHCredentials').authenticationType]",
-      "adminPassword": "[basics('SSHCredentials').password]",
-      "sshPublicKey": "[basics('SSHCredentials').sshPublicKey]",
+      "authenticationType": "[basics('password').authenticationType]",
+      "adminPassword": "[basics('password').password]",
+      "sshPublicKey": "[basics('password').sshPublicKey]",
       "vmSize": "[steps('appcenterConfig').vmSize]",
       "vNetNewOrExisting": "[steps('settingsStep').virtualNetworkConfiguration.virtualNetwork.newOrExisting]",
       "newOrExistingSubnetName": "[steps('settingsStep').virtualNetworkConfiguration.virtualNetwork.subnets.subnet1.name]",
       "existingVnetResourceGroupName": "[steps('clusterSettingsStep').virtualNetworkConfiguration.virtualNetwork.resourceGroup]"
-     }
+      
+    }
   }
 }
