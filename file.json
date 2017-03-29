@@ -17,7 +17,7 @@
         "osPlatform": "Linux"
       },
       {
-        "name": "password",
+        "name": "adminPassword",
         "type": "Microsoft.Compute.CredentialsCombo",
         "label": {
           "authenticationType": "Authentication type",
@@ -143,9 +143,9 @@
       "location": "[location()]",
       "customVmName": "[basics('customVmName')]",
       "adminUserName": "[basics('adminUsername')]",
-      "authenticationType": "[basics('password').authenticationType]",
-      "adminPassword": "[basics('password').password]",
-      "sshPublicKey": "[basics('password').sshPublicKey]",
+      "authenticationType": "[basics('adminPassword').authenticationType]",
+      "adminPassword": "[basics('adminPassword').password]",
+      "sshPublicKey": "[basics('adminPassword').sshPublicKey]",
       "vmSize": "[steps('appcenterConfig').vmSize]",
       "vNetNewOrExisting": "[steps('settingsStep').virtualNetworkConfiguration.virtualNetwork.newOrExisting]",
       "newOrExistingSubnetName": "[steps('settingsStep').virtualNetworkConfiguration.virtualNetwork.subnets.subnet1.name]",
