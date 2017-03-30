@@ -17,7 +17,7 @@
         "osPlatform": "Linux"
       },
       {
-        "name": "adminPassword",
+        "name": "SSHCredentials",
         "type": "Microsoft.Compute.CredentialsCombo",
         "label": {
           "authenticationType": "Authentication type",
@@ -26,9 +26,9 @@
           "sshPublicKey": "SSH public key"
         },
         "toolTip": {
-          "authenticationType": "Choose Authentication type Password or PublicKey(SSH).",
-          "password": "Enter the password for the specified user name.",
-          "sshPublicKey": "Copy Public key into field."
+          "authenticationType": "",
+          "password": "Password should be 12 to 72 characters long and should contain atleast one capital letter and one digit.",
+          "sshPublicKey": "Public/Private key pair can be generated using puttygen or ssh-keygen"
         },
         "constraints": {
           "required": true
@@ -50,15 +50,15 @@
         "bladeTitle": "AppCenter Settings",
         "elements": [
           {
-            "name": "customVmName",
+            "name": "customVmNamePrefix",
             "type": "Microsoft.Common.TextBox",
-            "label": "AppCenter system name",
+            "label": "AppCenter system name prefix",
             "defaultValue": "appcenter",
-            "toolTip": "Name to be used for AppCenter node",
+            "toolTip": "prefix to be used for AppCenter node",
             "constraints": {
               "required": true,
               "regex": "^[a-z][a-z0-9]{2,10}$",
-              "validationMessage": "System name must be between 3 and 10 characters long, can contain only numbers and lowercase letters, and must start with a letter."
+              "validationMessage": "Prefix must be between 3 and 10 characters long, can contain only numbers and lowercase letters, and must start with a letter."
             }
           },
           {
@@ -141,13 +141,14 @@
     ],
     "outputs": {
       "location": "[location()]",
-      "customVmName": "[basics('customVmName')]",
+      "customVmName": "[steps('settingsStep').customVmName]",
       "adminUserName": "[basics('adminUsername')]",
-      "authenticationType": "[basics('adminPassword').authenticationType]",
-      "adminPassword": "[basics('adminPassword').password]",
-      "sshPublicKey": "[basics('adminPassword').sshPublicKey]",
+      "authenticationType": "[basics('SSHCredentials').authenticationType]",
+      "adminPassword": "[basics('SSHCredentials').password]",
+      "sshPublicKey": "[basics('SSHCredentials').sshPublicKey]",
+      "dnsLabelPrefix": "[steps('settingsStep').dnsLabelPrefix]",
       "vmSize": "[steps('settingsStep').vmSize]",
-      "vNetNewOrExisting": "[steps('settingsStep').virtualNetworkConfiguration.virtualNetwork.newOrExisting]",
+      "newOrExistingVnetName": "[steps('settingsStep').virtualNetworkConfiguration.virtualNetwork.newOrExisting]",
       "newOrExistingSubnetName": "[steps('settingsStep').virtualNetworkConfiguration.virtualNetwork.subnets.subnet1.name]",
       "existingVnetResourceGroupName": "[steps('settingsStep').virtualNetworkConfiguration.virtualNetwork.resourceGroup]"
       
